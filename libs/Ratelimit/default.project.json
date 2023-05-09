@@ -1,0 +1,6 @@
+{
+	"name": "Ratelimit",
+	"tree": {
+		"$path": "Ratelimit.luau"
+	}
+}
