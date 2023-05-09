@@ -1,6 +1,6 @@
 [package]
 name = "red-blox/promise"
-version = "1.0.0-rc.1
+version = "1.0.0-rc.1"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 
