@@ -14,7 +14,7 @@ function sidebar() {
 }
 
 export default defineConfig({
-	title: 'Util',
+	title: 'Redblox Util',
 	description: 'A collection of small utilities for Roblox.',
 	lang: 'en-US',
 	head: [
