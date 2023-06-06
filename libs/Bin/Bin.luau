@@ -5,8 +5,10 @@ type BinItem = Instance | RBXScriptConnection | () -> ...any
 return function()
 	local Bin: { BinItem } = {}
 
-	return function(Item: BinItem)
+	return function<T>(Item: T & BinItem)
 		table.insert(Bin, Item)
+
+		return Item
 	end, function()
 		for _, Item in Bin do
 			if typeof(Item) == "Instance" then
