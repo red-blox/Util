@@ -16,7 +16,7 @@ return function<T>(Limit: number, Interval: number)
 				end)
 			end
 
-			if Count >= Limit then
+			if Count > Limit then
 				return false
 			end
 
@@ -28,7 +28,7 @@ return function<T>(Limit: number, Interval: number)
 				end)
 			end
 
-			if CountKeyless >= Limit then
+			if CountKeyless > Limit then
 				return false
 			end
 
