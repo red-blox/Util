@@ -3,32 +3,29 @@ local Spawn = require(script.Parent.Spawn)
 local Promise = {}
 Promise.__index = Promise
 
-function Promise.Promise(Callback: (Resolve: (...any) -> (), Reject: (...any) -> ()) -> ())
+function Promise.new(Callback: (Resolve: (...any) -> (), Reject: (...any) -> ()) -> ())
 	local self = setmetatable({}, Promise)
 
-	self.Status = "Pending"
+	self.Status = "Pending" :: "Pending" | "Resolved" | "Rejected"
 	self.OnResolve = {} :: { (...any) -> () }
 	self.OnReject = {} :: { (...any) -> () }
 
 	self.Value = {} :: { any }
 
-	self.Thread = nil :: thread?
-	self.Thread = coroutine.create(function()
-		xpcall(Callback, function(Error)
-			(self :: any):_Reject(Error)
-		end, function(...)
-			(self :: any):_Resolve(...)
-		end, function(...)
-			(self :: any):_Reject(...)
-		end)
-	end)
+	self.Thread = coroutine.create(xpcall) :: thread?
 
-	task.spawn(self.Thread :: thread)
+	task.spawn(self.Thread :: thread, Callback, function(Error)
+		(self :: any):_Reject(Error)
+	end, function(...)
+		(self :: any):_Resolve(...)
+	end, function(...)
+		(self :: any):_Reject(...)
+	end)
 
 	return self
 end
 
-Promise.new = Promise.Promise :: (Callback: (Resolve: (...any) -> (), Reject: (...any) -> ()) -> ()) -> Promise
+export type Promise = typeof(Promise.new(...))
 
 function Promise.Resolve(...: any): Promise
 	local self = setmetatable({}, Promise)
@@ -52,6 +49,206 @@ function Promise.Reject(...: any): Promise
 	self.Thread = nil :: thread?
 
 	return self
+end
+
+function Promise.All(PromiseList: { Promise })
+	if #PromiseList == 0 then
+		return Promise.Resolve({})
+	end
+
+	return Promise.new(function(Resolve, Reject)
+		local Finished = false
+
+		local Resolved = 0
+		local ValueList = {}
+
+		for i, Promise in PromiseList do
+			if Promise.Status == "Resolved" then
+				Resolved += 1
+				ValueList[i] = Promise.Value[1]
+			elseif Promise.Status == "Rejected" then
+				Reject(Promise.Value[1])
+				Finished = true
+				break
+			else
+				table.insert(Promise.OnResolve, function(Value)
+					if Finished then
+						return
+					end
+					
+					Resolved += 1
+					ValueList[i] = Value
+
+					if Resolved == #PromiseList then
+						Resolve(ValueList)
+						Finished = true
+					end
+				end)
+
+				table.insert(Promise.OnReject, function(Error)
+					if Finished then
+						return
+					end
+
+					Reject(Error)
+					Finished = true
+				end)
+			end
+		end
+
+		if Resolved == #PromiseList then
+			Resolve(ValueList)
+			Finished = true
+		end
+	end)
+end
+
+function Promise.AllSettled(PromiseList: { Promise })
+	if #PromiseList == 0 then
+		return Promise.Resolve({})
+	end
+
+	return Promise.new(function(Resolve, Reject)
+		local Finished = false
+
+		local Count = 0
+		local ValueList = {}
+
+		for i, Promise in PromiseList do
+			if Promise.Status == "Resolved" then
+				Count += 1
+				ValueList[i] = "Resolved"
+			elseif Promise.Status == "Rejected" then
+				Count += 1
+				ValueList[i] = "Rejected"
+			else
+				table.insert(Promise.OnResolve, function(Value)
+					if Finished then
+						return
+					end
+					
+					Count += 1
+					ValueList[i] = "Resolved"
+
+					if Count == #PromiseList then
+						Resolve(ValueList)
+						Finished = true
+					end
+				end)
+
+				table.insert(Promise.OnReject, function(Error)
+					if Finished then
+						return
+					end
+
+					Count += 1
+					ValueList[i] = "Rejected"
+
+					if Count == #PromiseList then
+						Resolve(ValueList)
+						Finished = true
+					end
+				end)
+			end
+		end
+
+		if Count == #PromiseList then
+			Resolve(ValueList)
+			Finished = true
+		end
+	end)
+end
+
+function Promise.Any(PromiseList: { Promise })
+	if #PromiseList == 0 then
+		return Promise.Reject({})
+	end
+
+	return Promise.new(function(Resolve, Reject)
+		local Finished = false
+
+		local Rejected = 0
+		local ValueList = {}
+
+		for i, Promise in PromiseList do
+			if Promise.Status == "Resolved" then
+				Resolve(Promise.Value[1])
+				Finished = true
+				break
+			elseif Promise.Status == "Rejected" then
+				Rejected += 1
+				ValueList[i] = Promise.Value[1]
+			else
+				table.insert(Promise.OnResolve, function(Value)
+					if Finished then
+						return
+					end
+					
+					Resolve(Value)
+					Finished = true
+				end)
+
+				table.insert(Promise.OnReject, function(Error)
+					if Finished then
+						return
+					end
+
+					Rejected += 1
+					ValueList[i] = Error
+
+					if Rejected == #PromiseList then
+						Reject(ValueList)
+						Finished = true
+					end
+				end)
+			end
+		end
+
+		if Rejected == #PromiseList then
+			Reject(ValueList)
+			Finished = true
+		end
+	end)
+end
+
+function Promise.Race(PromiseList: { Promise })
+	if #PromiseList == 0 then
+		return Promise.Reject("No promises to resolve.")
+	end
+
+	return Promise.new(function(Resolve, Reject)
+		local Finished = false
+
+		for _, Promise in PromiseList do
+			if Promise.Status == "Resolved" then
+				Resolve(unpack(Promise.Value))
+				Finished = true
+				break
+			elseif Promise.Status == "Rejected" then
+				Reject(unpack(Promise.Value))
+				Finished = true
+				break
+			else
+				table.insert(Promise.OnResolve, function(Value)
+					if Finished then
+						return
+					end
+					
+					Resolve(Value)
+					Finished = true
+				end)
+
+				table.insert(Promise.OnReject, function(Error)
+					if Finished then
+						return
+					end
+
+					Reject(Error)
+					Finished = true
+				end)
+			end
+		end
+	end)
 end
 
 function Promise._Resolve(self: Promise, ...: any)
@@ -81,16 +278,16 @@ function Promise._Reject(self: Promise, ...: any)
 end
 
 function Promise.Then(self: Promise, OnResolve: ((...any) -> ...any)?, OnReject: ((...any) -> ...any)?): Promise
-	return Promise.Promise(function(Resolve, Reject)
+	return Promise.new(function(Resolve, Reject)
 		local function PromiseResolutionProcedure(Value: Promise | any, ...: any)
 			if type(Value) == "table" and getmetatable(Value) == Promise then
 				if Value.Status == "Pending" then
 					table.insert(Value.OnResolve, Resolve)
 					table.insert(Value.OnReject, Reject)
 				elseif Value.Status == "Resolved" then
-					Resolve(Value.Value)
+					Resolve(unpack(Value.Value))
 				elseif Value.Status == "Rejected" then
-					Reject(Value.Value)
+					Reject(unpack(Value.Value))
 				end
 			else
 				Resolve(Value, ...)
@@ -129,21 +326,24 @@ function Promise.Then(self: Promise, OnResolve: ((...any) -> ...any)?, OnReject:
 	end)
 end
 
-function Promise.Catch(self: Promise, OnReject: (...any) -> ())
+function Promise.Catch(self: Promise, OnReject: (...any) -> ()): Promise
 	return self:Then(nil, OnReject)
 end
 
-function Promise.Finally(self: Promise, Finally: () -> ())
+function Promise.Finally(self: Promise, Finally: ("Pending" | "Resolved" | "Rejected") -> ()): Promise
+	-- Callbacks return self because `Then` is supposed to adopt state of returned promises.
 	return self:Then(function(...)
-		Finally()
-		return ...
+		Finally(self.Status :: any)
+		
+		return self
 	end, function(Error)
-		Finally()
-		error(Error)
+		Finally(self.Status :: any)
+		
+		return self
 	end)
 end
 
-function Promise.Await(self: Promise): ...any
+function Promise.Await(self: Promise)
 	if self.Status == "Resolved" then
 		return unpack(self.Value)
 	elseif self.Status == "Rejected" then
@@ -168,6 +368,25 @@ function Promise.Await(self: Promise): ...any
 	end
 end
 
-export type Promise = typeof(Promise.Promise(...))
+function Promise.StatusAwait(self: Promise): ("Pending" | "Resolved" | "Rejected", ...any)
+	if self.Status == "Resolved" then
+		return self.Status, unpack(self.Value)
+	elseif self.Status == "Rejected" then
+		return self.Status, unpack(self.Value)
+	else
+		local Current = coroutine.running()
+
+		local function Resume()
+			coroutine.resume(Current)
+		end
+
+		table.insert(self.OnResolve, Resume)
+		table.insert(self.OnReject, Resume)
+
+		coroutine.yield()
+
+		return self.Status :: any, unpack(self.Value)
+	end
+end
 
 return Promise
