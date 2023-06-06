@@ -1,9 +1,9 @@
 local FreeThread: thread? = nil
 
-local function FunctionPasser(fn, ...)
+local function FunctionPasser(Callback, ...)
 	local AquiredThread = FreeThread
 	FreeThread = nil
-	fn(...)
+	Callback(...)
 	FreeThread = AquiredThread
 end
 
@@ -13,11 +13,11 @@ local function Yielder()
 	end
 end
 
-return function<T...>(fn: (T...) -> (), ...: T...)
+return function<T...>(Callback: (T...) -> (), ...: T...)
 	if not FreeThread then
 		FreeThread = coroutine.create(Yielder)
 		coroutine.resume(FreeThread :: any)
 	end
 
-	task.spawn(FreeThread :: thread, fn, ...)
+	task.spawn(FreeThread :: thread, Callback, ...)
 end
