@@ -31,6 +31,10 @@ export default defineConfig({
 			{ icon: 'discord', link: 'https://discord.gg/mchCdAFPWU' },
 		],
 
+		nav: [
+			{ text: 'Installing', link: '/installing' },
+		],
+
 		sidebar: sidebar(),
 	}
 })
