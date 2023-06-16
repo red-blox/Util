@@ -1,4 +1,4 @@
-return function<T>(Limit: number, Interval: number)
+return {Ratelimit = function<T>(Limit: number, Interval: number)
 	assert(Limit > 0, "Limit must be greater than 0")
 
 	local CountMap = {} :: { [T]: number }
@@ -37,4 +37,4 @@ return function<T>(Limit: number, Interval: number)
 
 		return true
 	end
-end
+end}
