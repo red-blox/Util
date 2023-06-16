@@ -20,6 +20,6 @@ declare function Stop(): void;
  * @param Tag Tag
  * @param Start Callback, called for every instance that has the tag & any that have it added
  */
-declare function Collection(Tag: string, Start: (Instance: Instance) => () => void | void): typeof Stop;
+declare function Collection(Tag: string, Start: (Instance: Instance) => (() => void) | void): typeof Stop;
 
 export = Collection;
