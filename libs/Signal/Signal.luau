@@ -1,5 +1,5 @@
 local Promise = require(script.Parent.Promise)
-local Spawn = require(script.Parent.Spawn)
+local Spawn = require(script.Parent.Spawn).Spawn
 
 type SignalNode<T...> = {
 	Next: SignalNode<T...>?,
@@ -65,8 +65,8 @@ function Signal.DisconnectAll<T...>(self: Signal<T...>)
 	self.Root = nil
 end
 
-return function<T...>(): Signal<T...>
+return {Signal = function<T...>(): Signal<T...>
 	return setmetatable({
 		Root = nil,
 	}, Signal) :: any
-end
+end}
