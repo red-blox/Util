@@ -1,4 +1,4 @@
-import { promise } from "../../red-blox_promise@1.0.0/promise/Promise";
+import { promise } from "@redblox/promise";
 
 export type Response = {
 	Body: string;
@@ -8,7 +8,7 @@ export type Response = {
 	Ok: boolean;
 	Url: string;
 
-	Json(): unknown;
+	Json(): promise<unknown, unknown>;
 };
 
 export type Options = {
@@ -17,4 +17,17 @@ export type Options = {
 	Body?: string | { [key: string]: unknown };
 };
 
-export default function Fetch(Resource: string, Options?: Options): promise<Response, unknown>;
+/**
+ * A Promise based HTTP request utility very similar to fetch.
+ * This utility takes a resource and an `Options` table and returns a Promise that resolves to a response object. The request options contain the method, any headers, and the body of the request. If you pass a table as the body, it will be encoded as JSON. The response object contains the body, headers, status code, status text, and the URL of the request. The response object also contains a `Json` method that returns a Promise that resolves to the JSON encoded body.
+ * ```ts
+ * Fetch("https://api.quotable.io/random").Then((Response) => {
+ *     return $tuple(Response.Json());
+ * }).Then((Json: { [key: string]: unknown }) => {
+ *     print(`${Json.author} once said '${Json.content}'`);
+ * });
+ * ```
+ * @param Resource URL to fetch
+ * @param Options Request options
+ */
+export function Fetch(Resource: string, Options?: Options): promise<Response, unknown>;
