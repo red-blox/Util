@@ -25,7 +25,7 @@ local function Json(self: Response): any
 	end)
 end
 
-return function(Resource: string, Options: Options?)
+return {Fetch = function(Resource: string, Options: Options?)
 	local RealOptions: Options = Options or {}
 	local RealBody = if type(RealOptions.Body) == "table"
 		then HttpService:JSONEncode(RealOptions.Body)
@@ -50,4 +50,4 @@ return function(Resource: string, Options: Options?)
 			Json = Json,
 		})
 	end)
-end
+end}
