@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import promise from "../red-blox_promise@1.0.0/promise/Promise";
+import promise from "../../red-blox_promise@1.0.0/promise/Promise";
 
 export type SignalNode<T> = {
 	Next?: SignalNode<T>;
