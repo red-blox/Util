@@ -20,4 +20,4 @@ declare function Empty(): void;
  * const [Add, Empty] = Bin();
  * ```
  */
-export default function Bin(): LuaTuple<[typeof Add, typeof Empty]>;
+export function Bin(): LuaTuple<[typeof Add, typeof Empty]>;
