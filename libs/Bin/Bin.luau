@@ -1,8 +1,8 @@
-local Spawn = require(script.Parent.Spawn)
+local Spawn = require(script.Parent.Spawn).Spawn
 
 type BinItem = Instance | RBXScriptConnection | () -> ...any
 
-return function()
+return {Bin = function()
 	local Bin: { BinItem } = {}
 
 	return function<T>(Item: T & BinItem)
@@ -22,4 +22,4 @@ return function()
 
 		table.clear(Bin)
 	end
-end
+end}
