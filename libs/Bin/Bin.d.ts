@@ -1,4 +1,4 @@
-export type BinItem = Instance | RBXScriptConnection | (() => unknown);
+type BinItem = Instance | RBXScriptConnection | (() => unknown);
 
 /**
  * Adds item to Bin.
@@ -42,4 +42,10 @@ declare function Empty(): void;
  * Empty()
  * ```
  */
-export function Bin(): LuaTuple<[typeof Add, typeof Empty]>;
+declare function Bin(): LuaTuple<[typeof Add, typeof Empty]>;
+
+declare namespace Bin {
+    export { BinItem };
+}
+
+export = Bin;
