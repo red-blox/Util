@@ -17,4 +17,6 @@ declare function Stop(): void;
  * @param Interval Interval
  * @param Callback Callback
  */
-export function Clock(Interval: number, Callback: () => void): typeof Stop;
+declare function Clock(Interval: number, Callback: () => void): typeof Stop;
+
+export = Clock;
