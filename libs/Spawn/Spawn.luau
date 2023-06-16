@@ -13,11 +13,11 @@ local function Yielder()
 	end
 end
 
-return function<T...>(Callback: (T...) -> (), ...: T...)
+return {Spawn = function<T...>(Callback: (T...) -> (), ...: T...)
 	if not FreeThread then
 		FreeThread = coroutine.create(Yielder)
 		coroutine.resume(FreeThread :: any)
 	end
 
 	task.spawn(FreeThread :: thread, Callback, ...)
-end
+end}
