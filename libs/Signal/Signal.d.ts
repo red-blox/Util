@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { promise } from "@redblox/promise";
 
-export type SignalNode<T> = {
+type SignalNode<T> = {
 	Next?: SignalNode<T>;
 	Callback: (Value: T) => void;
 };
@@ -11,7 +11,7 @@ export type SignalNode<T> = {
  */
 declare function Disconnect(): void;
 
-export type Signal<T> = {
+type SignalObject<T> = {
 	Root?: SignalNode<T>;
 
 	/**
@@ -70,4 +70,10 @@ export type Signal<T> = {
  *
  * LogSignal.Fire("Hello, World!");
  */
-export function Signal<T>(): Signal<T>;
+declare function Signal<T>(): SignalObject<T>;
+
+declare namespace Signal {
+	export { SignalObject as Signal, SignalNode };
+}
+
+export = Signal;
