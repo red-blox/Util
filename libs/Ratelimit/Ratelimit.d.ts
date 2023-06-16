@@ -20,4 +20,6 @@ declare function LimitCheck<T>(Key?: T): boolean;
  * @param Limit
  * @param Interval
  */
-export function Ratelimit<T>(Limit: number, Interval: number): typeof LimitCheck;
+declare function Ratelimit<T>(Limit: number, Interval: number): typeof LimitCheck;
+
+export = Ratelimit;
