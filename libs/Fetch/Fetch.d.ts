@@ -1,6 +1,6 @@
 import { promise } from "@redblox/promise";
 
-export type Response = {
+type Response = {
 	Body: string;
 	Headers: { [key: string]: string };
 	Status: number;
@@ -11,7 +11,7 @@ export type Response = {
 	Json(): promise<unknown, unknown>;
 };
 
-export type Options = {
+type Options = {
 	Method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD" | "OPTIONS" | "CONNECT" | "TRACE";
 	Headers?: { [key: string]: string };
 	Body?: string | { [key: string]: unknown };
@@ -30,4 +30,10 @@ export type Options = {
  * @param Resource URL to fetch
  * @param Options Request options
  */
-export function Fetch(Resource: string, Options?: Options): promise<Response, unknown>;
+declare function Fetch(Resource: string, Options?: Options): promise<Response, unknown>;
+
+declare namespace Fetch {
+	export { Response, Options };
+}
+
+export = Fetch;
