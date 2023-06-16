@@ -1,6 +1,6 @@
 local RunService = game:GetService("RunService")
 
-return {Clock = function(Interval: number, Callback: () -> ())
+return function(Interval: number, Callback: () -> ())
 	local Time = 0
 	local DropInterval = Interval * 10
 
@@ -21,4 +21,4 @@ return {Clock = function(Interval: number, Callback: () -> ())
 	return function()
 		Connection:Disconnect()
 	end
-end}
+end
