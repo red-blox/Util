@@ -11,7 +11,7 @@ declare function LimitCheck<T>(Key?: T): boolean;
  You can also use the function without a key.
  * ```ts
  * // 3 calls per 10 seconds
- * const LimitCheck = Ratelimit<string>(3, 10);
+ * const LimitCheck = Ratelimit(3, 10);
  * LimitCheck("Key1"); // true
  * LimitCheck("Key1"); // true
  * LimitCheck("Key1"); // true
