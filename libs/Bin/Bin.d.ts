@@ -17,7 +17,6 @@ declare function Empty(): void;
 /**
  * Creates a new Bin object.
  * ```ts
- * import Bin from "?";
  * const [Add, Empty] = Bin();
  * ```
  */
