@@ -31,6 +31,22 @@ local ResolvedPromise = Promise.Resolve("This promise resolved!")
 local RejectedPromise = Promise.Reject("This promise rejected!")
 ```
 
+## `Promise.Retry` and `Promise.RetryWithDelay`
+
+These functions are wrappers around `Promise.new` that will retry an operation until it succeeds or the max number of retries is reached. `Promise.Retry` will retry the operation immediately, while `Promise.RetryWithDelay` will retry the operation after a delay. If the max number of retries is reached the Promise will be rejected with the last error.
+
+```lua
+-- Retry to a max of 10 times
+local PlayerDataPromise = Promise.Retry(10, function(Player)
+	return PlayerDataStore:GetAsync(Player.UserId)
+end)
+
+-- Retry to a max of 10 times with a 5 second delay in between each attempt
+local PlayerDataPromise = Promise.RetryWithDelay(10, 5, function(Player)
+	return PlayerDataStore:GetAsync(Player.UserId)
+end)
+```
+
 ## Chaining Promises
 
 The real power of Promises comes from the ability to chain them together. Using the `Then`, `Catch`, or `Finally` methods you can chain Promises together as each of those return a Promise themselves.

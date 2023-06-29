@@ -251,6 +251,52 @@ function Promise.Race(PromiseList: { Promise })
 	end)
 end
 
+function Promise.Retry(MaxAttempts: number, Callback: (...any) -> (...any), ...)
+	local Args = { ... }
+
+	return Promise.new(function(Resolve, Reject)
+		local Attempts = 0
+
+		while Attempts < MaxAttempts do
+			Attempts += 1
+
+			local Result = { pcall(Callback, unpack(Args)) }
+
+			if table.remove(Result, 1) then
+				Resolve(unpack(Result))
+				break
+			elseif Attempts == MaxAttempts then
+				Reject(unpack(Result))
+				break
+			end
+		end
+	end)
+end
+
+function Promise.RetryWithDelay(MaxAttempts: number, Delay: number, Callback: (...any) -> (...any), ...)
+	local Args = { ... }
+
+	return Promise.new(function(Resolve, Reject)
+		local Attempts = 0
+
+		while Attempts < MaxAttempts do
+			Attempts += 1
+
+			local Result = { pcall(Callback, unpack(Args)) }
+
+			if table.remove(Result, 1) then
+				Resolve(unpack(Result))
+				break
+			elseif Attempts == MaxAttempts then
+				Reject(unpack(Result))
+				break
+			else
+				task.wait(Delay)
+			end
+		end
+	end)
+end
+
 function Promise._Resolve(self: Promise, ...: any)
 	assert(self.Status == "Pending", "Cannot resolve a promise that is not pending.")
 
