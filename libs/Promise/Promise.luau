@@ -398,7 +398,7 @@ function Promise.Await(self: Promise)
 		local Current = coroutine.running()
 
 		local function Resume()
-			coroutine.resume(Current)
+			task.spawn(Current)
 		end
 
 		table.insert(self.OnResolve, Resume)
