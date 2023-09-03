@@ -27,6 +27,14 @@ features:
     title: Fetch
     details: A Promise based HTTP request utility very similar to fetch.
     link: /fetch
+  - icon: 🔮
+    title: Future
+    details: A lightweight class to represent asynchronous functions.
+    link: /future
+  - icon: 🛡️
+    title: Guard
+    details: A runtime type checker with support for luau types.
+    link: /guard
   - icon: 🤝
     title: Promise
     details: A promise implementation that prioritizes speed and ease of use.

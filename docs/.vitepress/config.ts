@@ -6,6 +6,8 @@ function sidebar() {
 		{ text: 'Clock', link: '/clock' },
 		{ text: 'Collection', link: '/collection' },
 		{ text: 'Fetch', link: '/fetch' },
+		{ text: 'Future', link: '/future' },
+		{ text: 'Guard', link: '/guard' },
 		{ text: 'Promise', link: '/promise' },
 		{ text: 'Ratelimit', link: '/ratelimit' },
 		{ text: 'Signal', link: '/signal' },

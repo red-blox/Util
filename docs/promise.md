@@ -6,6 +6,10 @@ A Promise is an object that represents an asynchronous operation. A Promise can 
 
 Promises are by far the most complex utility here. More a better overview of Promises in general, I suggest reading [this article](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises) on MDN.
 
+::: warning
+It is now suggested that you use [Futures](./future) over Promises. Futures provide significant performance improvements and intellisense with luau.
+:::
+
 ## Constructing Promises
 
 There are multiple ways to construct a Promise.
