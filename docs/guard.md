@@ -30,6 +30,39 @@ local Pass, NumberList = NumberListCheck({1, 2, 3}) -- Passes and returns true, 
 local Pass, StringList = NumberListCheck({"a", "b", "c"}) -- Fails and returns false, nil
 ```
 
+## How to Check Interfaces
+
+Due to Luau limitations Guard cannot check interfaces directly. Instead you can define custom check functions that check the interface:
+
+```lua
+local CheckInterface = {
+	Hello = Guard.String,
+	World = Guard.Number,
+}
+
+local function Check(UnknownValue: unknown)
+	assert(type(UnknownValue) == "table")
+	local Value: any = UnknownValue
+
+	return {
+		Hello = CheckInterface.Hello(Value.Hello),
+		World = CheckInterface.World(Value.World),
+	}
+end
+
+Check({
+	Hello = "String",
+	World = 10,
+}) -- Passes and returns {Hello = "String", World = 10}
+
+Check({
+	Hello = 10,
+	World = "String",
+}) -- Fails and errors
+```
+
+These interface check functions are large and unwieldy, however they are the best option for the moment.
+
 ## Luau Primitive Types
 
 ### `Guard.Any`
