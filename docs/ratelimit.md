@@ -22,7 +22,7 @@ LimitCheck("Key1") -- false
 ```
 
 ::: tip
-The limit is exclusive, use the maximum amount of calls you want to allow as the limit.
+The limit is inclusive, use the maximum amount of calls you want to allow as the limit.
 :::
 
 Ratelimits can also be used without keys.
