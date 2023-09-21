@@ -42,15 +42,16 @@ function Signal.Connect<T...>(self: Signal<T...>, Callback: (T...) -> ()): () ->
 	end
 end
 
-function Signal.Wait<T...>(self: Signal<T...>): Promise.Promise
-	return Promise.new(function(Resolve)
-		local Disconnect
+function Signal.Wait<T...>(self: Signal<T...>): T...
+	local Thread = coroutine.running()
+	local Disconnect
 
-		Disconnect = self:Connect(function(...)
-			Disconnect()
-			Resolve(... :: any)
-		end)
+	Disconnect = self:Connect(function(...)
+		Disconnect()
+		coroutine.resume(Thread, ...)
 	end)
+
+	return coroutine.yield()
 end
 
 function Signal.Fire<T...>(self: Signal<T...>, ...: T...)

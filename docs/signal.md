@@ -49,10 +49,10 @@ Signal:Fire("Hello", "world", 15, true)
 
 ## `Signal:Wait`
 
-This method returns a Promise that resolves when the Signal is next fired. The Promise will resolve with all values fired.
+This method yields until the next time the Signal is fired, and returns all values fired.
 
 ```lua
-Signal:Wait():Then(print):Await()
+local a, b, c = Signal:Wait()
 ```
 
 ## `Signal:DisconnectAll`

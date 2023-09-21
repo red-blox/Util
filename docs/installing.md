@@ -14,7 +14,7 @@ Future = "red-blox/future@^1.0.0"
 Guard = "red-blox/guard@^1.0.0"
 Promise = "red-blox/promise@^1.0.0"
 Ratelimit = "red-blox/ratelimit@^1.0.0"
-Signal = "red-blox/signal@^1.0.0"
+Signal = "red-blox/signal@^2.0.0"
 Spawn = "red-blox/spawn@^1.0.0"
 ```
 
