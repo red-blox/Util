@@ -1,4 +1,3 @@
-local Promise = require(script.Parent.Promise)
 local Spawn = require(script.Parent.Spawn)
 
 type SignalNode<T...> = {
@@ -10,7 +9,7 @@ export type Signal<T...> = {
 	Root: SignalNode<T...>?,
 
 	Connect: (self: Signal<T...>, Callback: (T...) -> ()) -> () -> (),
-	Wait: (self: Signal<T...>) -> Promise.Promise,
+	Wait: (self: Signal<T...>) -> T...,
 	Fire: (self: Signal<T...>, T...) -> (),
 	DisconnectAll: (self: Signal<T...>) -> (),
 }

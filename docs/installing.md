@@ -9,7 +9,7 @@ The utility modules are currently only available using wally. Add the modules yo
 Bin = "red-blox/bin@^1.0.0"
 Clock = "red-blox/clock@^1.0.0"
 Collection = "red-blox/collection@^1.0.0"
-Fetch = "red-blox/fetch@^1.0.0"
+Fetch = "red-blox/fetch@^2.0.0"
 Future = "red-blox/future@^1.0.0"
 Guard = "red-blox/guard@^1.0.0"
 Promise = "red-blox/promise@^1.0.0"
