@@ -25,7 +25,7 @@ features:
     link: /collection
   - icon: 🌐
     title: Fetch
-    details: A Promise based HTTP request utility very similar to fetch.
+    details: A Future based HTTP request utility very similar to Javascript's fetch.
     link: /fetch
   - icon: 🔮
     title: Future
