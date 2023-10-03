@@ -67,7 +67,7 @@ end
 
 function Future.After<T...>(self: Future<T...>, Callback: (T...) -> ())
 	if self.ValueList then
-		Spawn(Callback(table.unpack(self.ValueList)))
+		Spawn(Callback, table.unpack(self.ValueList))
 	else
 		table.insert(self.AfterList, Callback)
 	end
