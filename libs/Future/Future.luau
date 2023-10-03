@@ -29,7 +29,7 @@ end
 export type Future<T...> = typeof(Future.new(function(): T... end))
 
 function Future.RetryWithDelay<T..., A...>(MaxAttempts: number, Delay: number, Callback: (A...) -> T..., ...: A...): Future.Future<boolean, T...>
-	return Future.new(function(MaxAttempts: number, Delay: number, Callback: () -> (), ...)
+	return Future.new(function(MaxAttempts, Delay, Callback, ...)
 		local Attempts = 0
 
 		while Attempts < MaxAttempts do
@@ -48,7 +48,7 @@ function Future.RetryWithDelay<T..., A...>(MaxAttempts: number, Delay: number, C
 end
 
 function Future.Retry><T..., A...>(MaxAttempts: number, Callback: (A...) -> T..., ...: A...): Future.Future<boolean, T...>
-	return Future.new(function(MaxAttempts: number, Callback: () -> (), ...)
+	return Future.new(function(MaxAttempts, Callback, ...)
 		local Attempts = 0
 
 		while Attempts < MaxAttempts do
