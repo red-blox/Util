@@ -17,6 +17,25 @@ export type Signal<T...> = {
 local Signal = {}
 Signal.__index = Signal
 
+-- Extracted this function from Connect as it results in the closure
+-- made in Connect using less memory because this function can be static
+local function Disconnect<T...>(self: Signal<T...>, Node: SignalNode<T...>)
+	if self.Root == Node then
+		self.Root = Node.Next
+	else
+		local Current = self.Root
+
+		while Current do
+			if Current.Next == Node then
+				Current.Next = Node.Next
+				break
+			end
+
+			Current = Current.Next
+		end
+	end
+end
+
 function Signal.Connect<T...>(self: Signal<T...>, Callback: (T...) -> ()): () -> ()
 	local Node = {
 		Next = self.Root,
@@ -26,18 +45,7 @@ function Signal.Connect<T...>(self: Signal<T...>, Callback: (T...) -> ()): () ->
 	self.Root = Node
 
 	return function()
-		if self.Root == Node then
-			self.Root = Node.Next
-		else
-			local Current = self.Root
-			while Current do
-				if Current.Next == Node then
-					Current.Next = Node.Next
-					break
-				end
-				Current = Current.Next
-			end
-		end
+		Disconnect(self, Node)
 	end
 end
 
@@ -55,6 +63,7 @@ end
 
 function Signal.Fire<T...>(self: Signal<T...>, ...: T...)
 	local Current = self.Root
+
 	while Current do
 		Spawn(Current.Callback, ...)
 		Current = Current.Next
