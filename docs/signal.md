@@ -36,6 +36,19 @@ Signal:Fire("Hello, world!") -- No output
 Why does `Connect` return a function? This is to allow for easy use with other utilities like Bin, and to reduce bloat. An entire table and object is not needed to wrap a single function.
 :::
 
+## `Signal:Once`
+
+Similar to Connect, with the difference being that the listener provided will only run once when the signal is fired. The connection is also returned which allows you to disconnect it at anytime.
+
+```lua
+Signal:Once(function(Value)
+	print(Value)
+end)
+
+Signal:Fire("Hello, world!") -- "Hello, world!"
+Signal:Fire("Hello, world!") -- No output
+```
+
 ## `Signal:Fire`
 
 To fire a value from a Signal, use the `Fire` method. This will fire the passed values to all connected listeners.

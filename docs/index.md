@@ -6,9 +6,12 @@ hero:
   text: A collection of small utilities for Roblox.
   tagline: Select a utility below to get started.
   actions:
+    - theme: brand
+      text: Install
+      link: /installing
     - theme: alt
       text: View on GitHub
-      link: https://github.com/red-blox/Red
+      link: https://github.com/red-blox/util
 
 features:
   - icon: 🗑️
