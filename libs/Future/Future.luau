@@ -66,7 +66,11 @@ function Future.UnwrapOrElse<T...>(self: Future<T...>, Else: () -> T...)
 end
 
 function Future.After<T...>(self: Future<T...>, Callback: (T...) -> ())
-	table.insert(self.AfterList, Callback)
+	if self.ValueList then
+		Callback(table.unpack(self.ValueList))
+	else
+		table.insert(self.AfterList, Callback)
+	end
 end
 
 function Future.Await<T...>(self: Future<T...>): T...
