@@ -58,7 +58,7 @@ function Signal.Once<T...>(self: Signal<T...>, Callback: (T...) -> ()): () -> ()
 
  	Disconnect = self:Connect(function(...)
 		Disconnect()
-		func(...)
+		Callback(...)
 	end)
 	
 	return Disconnect
