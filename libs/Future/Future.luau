@@ -37,8 +37,8 @@ function Future.RetryWithDelay<T..., A...>(MaxAttempts: number, Delay: number, C
 
 			local Result = {pcall(Callback, ...)}
 
-			if table.remove(Result, 1) then
-				return true, Result
+			if table.find(Result, true) then
+				return Result
 			elseif Attempts == MaxAttempts then
 				return Result
 			end
