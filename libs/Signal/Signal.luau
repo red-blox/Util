@@ -53,6 +53,17 @@ function Signal.Wait<T...>(self: Signal<T...>): T...
 	return coroutine.yield()
 end
 
+function Signal.Once<T...>(self: Signal<T...>, Callback: (T...) -> ()): () -> ()
+	local Disconnect
+
+ 	Disconnect = self:Connect(function(...)
+		Disconnect()
+		func(...)
+	end)
+	
+	return Disconnect
+end
+
 function Signal.Fire<T...>(self: Signal<T...>, ...: T...)
 	local Current = self.Root
 	while Current do
