@@ -56,7 +56,7 @@ function Future.Retry><T..., A...>(MaxAttempts: number, Callback: (A...) -> T...
 
 			local Result = {pcall(Callback, ...)}
 
-			if table.remove(Result, 1) then
+			if table.find(Result, true) then
 				return true, Result
 			elseif Attempts == MaxAttempts then
 				return Result
