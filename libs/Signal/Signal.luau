@@ -10,6 +10,7 @@ export type Signal<T...> = {
 
 	Connect: (self: Signal<T...>, Callback: (T...) -> ()) -> () -> (),
 	Wait: (self: Signal<T...>) -> T...,
+	Once: (self: Signal<T...>, Callback: (T...) -> ()) -> () -> (),
 	Fire: (self: Signal<T...>, T...) -> (),
 	DisconnectAll: (self: Signal<T...>) -> (),
 }
@@ -64,11 +65,11 @@ end
 function Signal.Once<T...>(self: Signal<T...>, Callback: (T...) -> ()): () -> ()
 	local Disconnect
 
- 	Disconnect = self:Connect(function(...)
+	Disconnect = self:Connect(function(...)
 		Disconnect()
 		Callback(...)
 	end)
-	
+
 	return Disconnect
 end
 
