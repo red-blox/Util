@@ -28,6 +28,43 @@ end
 
 export type Future<T...> = typeof(Future.new(function(): T... end))
 
+function Future.RetryWithDelay<T..., A...>(MaxAttempts: number, Delay: number, Callback: (A...) -> T..., ...: A...): Future.Future<boolean, T...>
+	return Future.new(function(MaxAttempts: number, Delay: number, Callback: () -> (), ...)
+		local Attempts = 0
+
+		while Attempts < MaxAttempts do
+			Attempts += 1
+
+			local Result = {pcall(Callback, ...)}
+
+			if table.remove(Result, 1) then
+				return true, Result
+			elseif Attempts == MaxAttempts then
+				return Result
+			end
+			task.wait(Delay)
+		end
+	end, Delay, MaxAttempts, Callback, ...)
+end
+
+function Future.Retry><T..., A...>(MaxAttempts: number, Callback: (A...) -> T..., ...: A...): Future.Future<boolean, T...>
+	return Future.new(function(MaxAttempts: number, Callback: () -> (), ...)
+		local Attempts = 0
+
+		while Attempts < MaxAttempts do
+			Attempts += 1
+
+			local Result = {pcall(Callback, ...)}
+
+			if table.remove(Result, 1) then
+				return true, Result
+			elseif Attempts == MaxAttempts then
+				return Result
+			end
+		end
+	end, MaxAttempts, Callback, ...)
+end
+
 function Future.Try<T..., A...>(Callback: (A...) -> T..., ...: A...)
 	return Future.new(pcall, Callback, ...)
 end
