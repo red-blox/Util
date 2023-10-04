@@ -1,55 +1,41 @@
 local Spawn = require(script.Parent.Spawn)
 
-local Future = {}
-Future.__index = Future
+export type Future<T...> = {
+	ValueList: { any }?,
+	AfterList: { (T...) -> () },
+	YieldList: { thread },
 
-function Future.new<T..., A...>(Callback: (A...) -> T..., ...: A...)
-	local self = setmetatable({}, Future)
+	IsComplete: (self: Future<T...>) -> boolean,
+	IsPending: (self: Future<T...>) -> boolean,
 
-	self.ValueList = nil :: { any }?
+	Expect: (self: Future<T...>, Message: string) -> T...,
+	Unwrap: (self: Future<T...>) -> T...,
+	UnwrapOr: (self: Future<T...>, T...) -> T...,
+	UnwrapOrElse: (self: Future<T...>, Else: () -> T...) -> T...,
 
-	self.AfterList = {} :: { (T...) -> () }
-	self.YieldList = {} :: { thread }
+	After: (self: Future<T...>, Callback: (T...) -> ()) -> (),
+	Await: (self: Future<T...>) -> T...,
+}
 
-	task.spawn(function(self, ...)
-		self.ValueList = { Callback(...) }
-
-		for _, Thread in self.YieldList do
-			task.spawn(Thread, table.unpack(self.ValueList))
-		end
-
-		for _, Callback in self.AfterList do
-			Spawn(Callback, table.unpack(self.ValueList))
-		end
-	end, self, ...)
-
-	return self
-end
-
-export type Future<T...> = typeof(Future.new(function(): T... end))
-
-function Future.Try<T..., A...>(Callback: (A...) -> T..., ...: A...)
-	return Future.new(pcall, Callback, ...)
-end
-
-function Future.IsComplete<T...>(self: Future<T...>)
+local function IsComplete<T...>(self: Future<T...>): boolean
 	return self.ValueList ~= nil
 end
 
-function Future.IsPending<T...>(self: Future<T...>)
+local function IsPending<T...>(self: Future<T...>): boolean
 	return self.ValueList == nil
 end
 
-function Future.Expect<T...>(self: Future<T...>, Message: string): T...
+local function Expect<T...>(self: Future<T...>, Message: string): T...
 	assert(self.ValueList, Message)
+
 	return table.unpack(self.ValueList)
 end
 
-function Future.Unwrap<T...>(self: Future<T...>): T...
-	return self:Expect("Attempt to unwrap pending value!")
+local function Unwrap<T...>(self: Future<T...>): T...
+	return self:Expect("Attempt to unwrap pending future!")
 end
 
-function Future.UnwrapOr<T...>(self: Future<T...>, ...: T...)
+local function UnwrapOr<T...>(self: Future<T...>, ...): T...
 	if self.ValueList then
 		return table.unpack(self.ValueList)
 	else
@@ -57,7 +43,7 @@ function Future.UnwrapOr<T...>(self: Future<T...>, ...: T...)
 	end
 end
 
-function Future.UnwrapOrElse<T...>(self: Future<T...>, Else: () -> T...)
+local function UnwrapOrElse<T...>(self: Future<T...>, Else: () -> T...): T...
 	if self.ValueList then
 		return table.unpack(self.ValueList)
 	else
@@ -65,7 +51,7 @@ function Future.UnwrapOrElse<T...>(self: Future<T...>, Else: () -> T...)
 	end
 end
 
-function Future.After<T...>(self: Future<T...>, Callback: (T...) -> ())
+local function After<T...>(self: Future<T...>, Callback: (T...) -> ()): T...
 	if self.ValueList then
 		Spawn(Callback, table.unpack(self.ValueList))
 	else
@@ -73,7 +59,7 @@ function Future.After<T...>(self: Future<T...>, Callback: (T...) -> ())
 	end
 end
 
-function Future.Await<T...>(self: Future<T...>): T...
+local function Await<T...>(self: Future<T...>): T...
 	if self.ValueList then
 		return table.unpack(self.ValueList)
 	else
@@ -83,4 +69,45 @@ function Future.Await<T...>(self: Future<T...>): T...
 	end
 end
 
-return Future
+local function Future<T..., A...>(Callback: (A...) -> T..., ...: A...): Future<T...>
+	local self: Future<T...> = {
+		ValueList = nil,
+		AfterList = {},
+		YieldList = {},
+
+		IsComplete = IsComplete,
+		IsPending = IsPending,
+
+		Expect = Expect,
+		Unwrap = Unwrap,
+		UnwrapOr = UnwrapOr,
+		UnwrapOrElse = UnwrapOrElse,
+
+		After = After,
+		Await = Await,
+	} :: any
+
+	Spawn(function(self: Future<T...>, Callback: (A...) -> T..., ...: A...)
+		local ValueList = { Callback(...) }
+		self.ValueList = ValueList
+
+		for _, Thread in self.YieldList do
+			task.spawn(Thread, table.unpack(ValueList))
+		end
+
+		for _, Callback in self.AfterList do
+			Spawn(Callback, table.unpack(ValueList))
+		end
+	end, self, Callback, ...)
+
+	return self
+end
+
+local function Try<T..., A...>(Callback: (A...) -> T..., ...: A...): Future<(boolean, T...)>
+	return Future(pcall, Callback, ...)
+end
+
+return {
+	new = Future,
+	Try = Try,
+}
