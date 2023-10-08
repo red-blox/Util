@@ -165,12 +165,14 @@ end
 
 local CFrame: Check<CFrame> = function(Value)
 	assert(typeof(Value) == "CFrame")
+	assert(Value == Value)
 
 	return Value
 end
 
 local Color3: Check<Color3> = function(Value)
 	assert(typeof(Value) == "Color3")
+	assert(Value == Value)
 
 	return Value
 end
@@ -189,6 +191,7 @@ end
 
 local Vector2: Check<Vector2> = function(Value)
 	assert(typeof(Value) == "Vector2")
+	assert(Value == Value)
 
 	return Value
 end
@@ -201,6 +204,7 @@ end
 
 local Vector3: Check<Vector3> = function(Value)
 	assert(typeof(Value) == "Vector3")
+	assert(Value == Value)
 
 	return Value
 end
