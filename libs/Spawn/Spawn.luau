@@ -14,8 +14,8 @@ end
 return function<T...>(Callback: (T...) -> (), ...: T...)
 	local Thread
 	if #FreeThreads > 0 then
-		Thread = FreeThreads[1]
-		FreeThreads[1], FreeThreads[#FreeThreads] = FreeThreads[#FreeThreads], nil
+		Thread = FreeThreads[#FreeThreads]
+		FreeThreads[#FreeThreads] = nil
 	else
 		Thread = coroutine.create(Yielder)
 		coroutine.resume(Thread)
