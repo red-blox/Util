@@ -1,23 +1,25 @@
-local FreeThread: thread? = nil
+local FreeThreads: { thread } = {}
 
-local function FunctionPasser(Callback, ...)
-	local AquiredThread = FreeThread
-	FreeThread = nil
+local function RunCallback(Callback, Thread, ...)
 	Callback(...)
-	FreeThread = AquiredThread
+	table.insert(FreeThreads, Thread)
 end
 
 local function Yielder()
 	while true do
-		FunctionPasser(coroutine.yield())
+		RunCallback(coroutine.yield())
 	end
 end
 
 return function<T...>(Callback: (T...) -> (), ...: T...)
-	if not FreeThread then
-		FreeThread = coroutine.create(Yielder)
-		coroutine.resume(FreeThread :: any)
+	local Thread
+	if #FreeThreads > 0 then
+		Thread = FreeThreads[#FreeThreads]
+		FreeThreads[#FreeThreads] = nil
+	else
+		Thread = coroutine.create(Yielder)
+		coroutine.resume(Thread)
 	end
 
-	task.spawn(FreeThread :: thread, Callback, ...)
+	task.spawn(Thread, Callback, Thread, ...)
 end
