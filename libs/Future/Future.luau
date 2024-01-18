@@ -114,8 +114,37 @@ local function ToFuture<T..., A...>(Callback: (A...) -> T...): (A...) -> Future<
 	end
 end
 
+-- Only works for futures returning one value (which to be honest is most cases, hence why it gets its own function)
+-- Has a relatively unintuitive type error when using a future with more than one return value, so it doesn't get to be called just "All"
+local function AllSingle<T>(futures: { Future<T> }): Future<{ T }>
+	return Future(function(futures: { Future<T> }): { T }
+		local futureValues: any = table.create(#futures)
+		for k, future in futures do
+			futureValues[k] = future:Await()
+		end
+		return futureValues
+	end, futures)
+end
+
+-- Works for futures returning multiple values, but without table tuple types, we can only return a function that returns a tuple to preserve typing.
+local function All<T...>(futures: { Future<T...> }): Future<{ () -> T... }>
+	return Future(function(futures: { Future<T...> }): { () -> T... }
+		local futureValues: any = table.create(#futures)
+		for k, future in futures do
+			local values = table.pack(future:Await())
+			futureValues[k] = function()
+				return table.unpack(values)
+			end
+		end
+		return futureValues
+	end, futures)
+end
+
+
 return {
 	new = Future,
 	Try = Try,
 	ToFuture = ToFuture,
+	All = All,
+	AllSingle = AllSingle,
 }
