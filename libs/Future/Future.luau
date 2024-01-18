@@ -140,6 +140,28 @@ local function All<T...>(futures: { Future<T...> }): Future<{ () -> T... }>
 	end, futures)
 end
 
+local function Any<T...>(futures: { Future<T...> }): Future<T...>
+	return Future(function(futures: { Future<T...> })
+		local thread = coroutine.running()
+		local returned = false
+
+		for _, future in futures do
+			if future:IsComplete() then
+				returned = true
+				return future:Unwrap()
+			end
+
+			future:After(function(...)
+				if not returned then
+					returned = true
+					task.spawn(thread, ...)
+				end
+			end)
+		end
+
+		return coroutine.yield()
+	end, futures)
+end
 
 return {
 	new = Future,
@@ -147,4 +169,5 @@ return {
 	ToFuture = ToFuture,
 	All = All,
 	AllSingle = AllSingle,
+	Any = Any,
 }
