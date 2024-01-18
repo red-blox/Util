@@ -107,7 +107,15 @@ local function Try<T..., A...>(Callback: (A...) -> T..., ...: A...): Future<(boo
 	return Future(pcall, Callback, ...)
 end
 
+-- Use try as we don't know if the future could error or not, and erroring futures create memory leaks.
+local function ToFuture<T..., A...>(Callback: (A...) -> T...): (A...) -> Future<(boolean, T...)>
+	return function(...)
+		return Try(Callback, ...)
+	end
+end
+
 return {
 	new = Future,
 	Try = Try,
+	ToFuture = ToFuture,
 }
