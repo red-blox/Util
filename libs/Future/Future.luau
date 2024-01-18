@@ -163,6 +163,12 @@ local function Any<T...>(futures: { Future<T...> }): Future<T...>
 	end, futures)
 end
 
+local function Value<T...>(...: T...): Future<T...>
+	return Future(function(...)
+		return ...
+	end, ...)
+end
+
 return {
 	new = Future,
 	Try = Try,
@@ -170,4 +176,5 @@ return {
 	All = All,
 	AllSingle = AllSingle,
 	Any = Any,
+	Value = Value,
 }
