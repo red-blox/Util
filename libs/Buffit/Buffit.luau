@@ -1,3 +1,4 @@
+--!native
 --!nocheck
 -- We lie to the type system to provide a better api
 
