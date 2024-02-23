@@ -107,7 +107,61 @@ local function Try<T..., A...>(Callback: (A...) -> T..., ...: A...): Future<(boo
 	return Future(pcall, Callback, ...)
 end
 
+-- Use try as we don't know if the future could error or not, and erroring futures create memory leaks.
+local function ToFuture<T..., A...>(Callback: (A...) -> T...): (A...) -> Future<(boolean, T...)>
+	return function(...)
+		return Try(Callback, ...)
+	end
+end
+
+-- Works for futures returning multiple values, but without table tuple types, we can only return a function that returns a tuple to preserve typing.
+local function All<T...>(futures: { Future<T...> }): Future<{ () -> T... }>
+	return Future(function(futures: { Future<T...> }): { () -> T... }
+		local futureValues: any = table.create(#futures)
+		for k, future in futures do
+			local values = table.pack(future:Await())
+			futureValues[k] = function()
+				return table.unpack(values)
+			end
+		end
+		return futureValues
+	end, futures)
+end
+
+local function Any<T...>(futures: { Future<T...> }): Future<T...>
+	return Future(function(futures: { Future<T...> })
+		local thread = coroutine.running()
+		local returned = false
+
+		for _, future in futures do
+			if future:IsComplete() then
+				returned = true
+				return future:Unwrap()
+			end
+
+			future:After(function(...)
+				if not returned then
+					returned = true
+					task.spawn(thread, ...)
+				end
+			end)
+		end
+
+		return coroutine.yield()
+	end, futures)
+end
+
+local function Value<T...>(...: T...): Future<T...>
+	return Future(function(...)
+		return ...
+	end, ...)
+end
+
 return {
 	new = Future,
 	Try = Try,
+	ToFuture = ToFuture,
+	All = All,
+	Any = Any,
+	Value = Value,
 }
